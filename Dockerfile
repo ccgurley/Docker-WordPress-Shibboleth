@@ -25,6 +25,8 @@ RUN set -ex; \
 		| sort -u \
 		| xargs -rt apt-mark manual; \
 	\
+        curl --fail -o /root/switchaai-apt-source_1.0.0ubuntu1_all.deb --remote-name https://pkg.switch.ch/switchaai/ubuntu/dists/bionic/main/binary-all/misc/switchaai-apt-source_1.0.0ubuntu1_all.deb \
+        apt install -y /root/switchaai-apt-source_1.0.0ubuntu1_all.deb \
 	apt-get install -y libapache2-mod-shib2; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/lib/apt/lists/* \
