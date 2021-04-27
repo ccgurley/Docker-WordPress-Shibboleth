@@ -5,6 +5,8 @@ RUN set -ex; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
 	\
+        curl --fail -o /root/switchaai-apt-source_1.0.0ubuntu1_all.deb --remote-name https://pkg.switch.ch/switchaai/ubuntu/dists/bionic/main/binary-all/misc/switchaai-apt-source_1.0.0ubuntu1_all.deb; \
+        apt install -y /root/switchaai-apt-source_1.0.0ubuntu1_all.deb; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
 		libjpeg-dev \
@@ -25,22 +27,17 @@ RUN set -ex; \
 		| sort -u \
 		| xargs -rt apt-mark manual; \
 	\
-        curl --fail -o /root/switchaai-apt-source_1.0.0ubuntu1_all.deb --remote-name https://pkg.switch.ch/switchaai/ubuntu/dists/bionic/main/binary-all/misc/switchaai-apt-source_1.0.0ubuntu1_all.deb \
-        apt install -y /root/switchaai-apt-source_1.0.0ubuntu1_all.deb \
 	apt-get install -y libapache2-mod-shib2; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/* \
+	rm -rf /var/lib/apt/lists/*
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
-RUN { \
-		echo 'opcache.memory_consumption=128'; \
-		echo 'opcache.interned_strings_buffer=8'; \
-		echo 'opcache.max_accelerated_files=4000'; \
-		echo 'opcache.revalidate_freq=2'; \
-		echo 'opcache.fast_shutdown=1'; \
-		echo 'opcache.enable_cli=1'; \
-	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
-	
+RUN echo 'opcache.memory_consumption=128' > /usr/local/etc/php/conf.d/opcache-recommended.ini
+RUN echo 'opcache.interned_strings_buffer=8' >> /usr/local/etc/php/conf.d/opcache-recommended.ini
+RUN echo 'opcache.max_accelerated_files=4000' >> /usr/local/etc/php/conf.d/opcache-recommended.ini
+RUN echo 'opcache.revalidate_freq=2' >> /usr/local/etc/php/conf.d/opcache-recommended.ini
+RUN echo 'opcache.fast_shutdown=1' >> /usr/local/etc/php/conf.d/opcache-recommended.ini
+RUN echo 'opcache.enable_cli=1' >> /usr/local/etc/php/conf.d/opcache-recommended.ini
 RUN echo '<Location /Shibboleth.sso>' >> /etc/apache2/conf-available/shib2.conf
 RUN echo '  SetHandler shib' >> /etc/apache2/conf-available/shib2.conf
 RUN echo '  AuthType None' >> /etc/apache2/conf-available/shib2.conf
@@ -48,7 +45,7 @@ RUN echo '  Require all granted' >> /etc/apache2/conf-available/shib2.conf
 RUN echo '  RewriteEngine On' >> /etc/apache2/conf-available/shib2.conf
 RUN echo '  RewriteRule ^/Shibboleth.sso.* - [L]' >> /etc/apache2/conf-available/shib2.conf
 RUN echo '</Location>' >> /etc/apache2/conf-available/shib2.conf
-RUN a2enmod rewrite expires shib2
+RUN a2enmod rewrite expires shib
 RUN a2enconf shib2
 
 VOLUME /var/www/html
